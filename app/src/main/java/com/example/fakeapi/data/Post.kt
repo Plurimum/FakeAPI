@@ -4,7 +4,7 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.fakeapi.MainActivity.Companion.TABLE_NAME
+import com.example.fakeapi.activities.MainActivity.Companion.TABLE_NAME
 import com.squareup.moshi.Json
 import kotlinx.android.parcel.Parcelize
 

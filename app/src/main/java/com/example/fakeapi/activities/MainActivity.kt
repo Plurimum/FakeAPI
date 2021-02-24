@@ -1,4 +1,4 @@
-package com.example.fakeapi
+package com.example.fakeapi.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -7,7 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ProgressBar
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.fakeapi.activities.AddPostActivity
+import com.example.fakeapi.R
 import com.example.fakeapi.adapters.PostAdapter
 import com.example.fakeapi.application.FakeApp
 import com.example.fakeapi.asynctasks.DBClearTask
@@ -157,17 +157,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_refresh -> {
-                getAllPostsFromBD()
-                return true
-            }
-            R.id.action_reload -> {
-                getAllPosts()
-                return true
-            }
-            else -> false
-        }
+        getAllPosts()
+        return true
     }
 
     inner class PostListCallback : Callback<List<Post>> {

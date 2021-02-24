@@ -2,7 +2,7 @@ package com.example.fakeapi.asynctasks
 
 import android.os.AsyncTask
 import android.widget.ProgressBar
-import com.example.fakeapi.MainActivity
+import com.example.fakeapi.activities.MainActivity
 import com.example.fakeapi.application.FakeApp
 import kotlinx.android.synthetic.main.activity_main.*
 

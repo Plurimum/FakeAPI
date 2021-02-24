@@ -1,7 +1,6 @@
 package com.example.fakeapi
 
 import androidx.room.Database
-import androidx.room.InvalidationTracker
 import androidx.room.RoomDatabase
 import com.example.fakeapi.data.Post
 import com.example.fakeapi.interfaces.FakeDAO

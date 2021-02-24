@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.fakeapi.MainActivity.Companion.TABLE_NAME
+import com.example.fakeapi.activities.MainActivity.Companion.TABLE_NAME
 import com.example.fakeapi.data.Post
 
 @Dao

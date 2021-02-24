@@ -4,9 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.AsyncTask
 import android.widget.ProgressBar
-import com.example.fakeapi.MainActivity
-import com.example.fakeapi.MainActivity.Companion.FIRST_LAUNCH_KEY
-import com.example.fakeapi.MainActivity.Companion.MAIN_PREFS_NAME
+import com.example.fakeapi.activities.MainActivity
+import com.example.fakeapi.activities.MainActivity.Companion.FIRST_LAUNCH_KEY
+import com.example.fakeapi.activities.MainActivity.Companion.MAIN_PREFS_NAME
 import com.example.fakeapi.R
 import com.example.fakeapi.application.FakeApp
 import com.example.fakeapi.data.Post
