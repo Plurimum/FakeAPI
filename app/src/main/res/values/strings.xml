@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">FakeAPI</string>
+    <string name="delete">delete</string>
+    <string name="bad_connection">Bad Connection</string>
+    <string name="fail">Failed</string>
+    <string name="new_posts">New posts added</string>
+    <string name="del_posts">Post deleted</string>
+    <string name="ok">OK</string>
+    <string name="title">Title</string>
+    <string name="body">Body</string>
+    <string name="enter_title">Enter title</string>
+    <string name="enter_body">Enter body</string>
+    <string name="post">Post</string>
+</resources>
