@@ -4,6 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.fakeapi.*
+import com.example.fakeapi.MainActivity.Companion.CUR_USER_ID
+import com.example.fakeapi.MainActivity.Companion.NEW_POST_KEY
+import com.example.fakeapi.MainActivity.Companion.NEW_POST_RESULT_CODE
 import com.example.fakeapi.data.Post
 import kotlinx.android.synthetic.main.activity_add_post.*
 import kotlin.math.absoluteValue

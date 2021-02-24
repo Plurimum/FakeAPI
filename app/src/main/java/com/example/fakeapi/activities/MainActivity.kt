@@ -1,17 +1,21 @@
 package com.example.fakeapi
 
-import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.ProgressBar
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.fakeapi.activities.AddPostActivity
 import com.example.fakeapi.adapters.PostAdapter
 import com.example.fakeapi.application.FakeApp
+import com.example.fakeapi.asynctasks.DBClearTask
+import com.example.fakeapi.asynctasks.DBDeleteTask
+import com.example.fakeapi.asynctasks.DBGetAllTask
+import com.example.fakeapi.asynctasks.DBInsertTask
 import com.example.fakeapi.data.Post
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -19,37 +23,47 @@ import retrofit2.Response
 
 import kotlin.collections.ArrayList
 
-
-const val NEW_POST_KEY = "NEW_POST_KEY"
-const val POST_LIST_KEY = "POST_LIST_KEY"
-const val CUR_USER_ID = 1
-const val NEW_POST_REQUEST_CODE = 1
-const val NEW_POST_RESULT_CODE = 2
-const val QUERY_POST = "POST"
-const val QUERY_DELETE = "DELETE"
-
 class MainActivity : AppCompatActivity() {
 
-    private var postList: ArrayList<Post> = arrayListOf()
+    companion object {
+        const val NEW_POST_KEY = "NEW_POST_KEY"
+        const val POST_LIST_KEY = "POST_LIST_KEY"
+        const val CUR_USER_ID = 1
+        const val NEW_POST_REQUEST_CODE = 1
+        const val NEW_POST_RESULT_CODE = 2
+        const val QUERY_POST = "POST"
+        const val QUERY_DELETE = "DELETE"
+        const val DATABASE_NAME = "post_database"
+        const val TABLE_NAME = "fake_posts"
+        const val FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY"
+        const val MAIN_PREFS_NAME = "MAIN_PREFS_NAME"
+    }
+
+    var postList: ArrayList<Post> = arrayListOf()
 
     private lateinit var listAdapter: PostAdapter
+
+    private var getAllTask: DBGetAllTask? = null
+    private var insertTask: DBInsertTask? = null
+    private var deleteAllTask: DBClearTask? = null
+    private var deleteTask: DBDeleteTask? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(toolbar)
         if (savedInstanceState != null) {
             postList =
                 savedInstanceState.getParcelableArrayList<Post>(POST_LIST_KEY) as ArrayList<Post>
         }
-        if (postList.isNullOrEmpty()) getPostsByUserId()
-        else {
-            progressBar.visibility = ProgressBar.INVISIBLE
+        if (postList.isNullOrEmpty()) {
+            getAllPostsFromBD()
         }
 
         listAdapter = PostAdapter(postList) {
             deletePost(it)
         }
-        recyclerView.apply {
+        main_recycler.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = listAdapter
         }
@@ -62,8 +76,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getPostsByUserId() {
-        FakeApp.instance.fakeAPIService.getPostByUserId(CUR_USER_ID).enqueue(PostListCallback())
+    fun getAllPosts() {
+        progressBar.visibility = ProgressBar.VISIBLE
+        FakeApp.instance.fakeAPIService.getAllPosts().enqueue(PostListCallback())
     }
 
     private fun postNewPost(data: Post) {
@@ -75,16 +90,41 @@ class MainActivity : AppCompatActivity() {
             .enqueue(PostCallback(QUERY_DELETE, post))
     }
 
-    private fun update() {
+    private fun getAllPostsFromBD() {
+        getAllTask?.cancel(true)
+        getAllTask = DBGetAllTask(this)
+        getAllTask?.execute()
+    }
+
+    private fun insertPostInDatabase(vararg post: Post) {
+        progressBar.visibility = ProgressBar.VISIBLE
+        insertTask?.cancel(true)
+        insertTask = DBInsertTask(this)
+        insertTask?.execute(*post)
+    }
+
+    private fun reloadAPI() {
+        progressBar.visibility = ProgressBar.VISIBLE
+        deleteAllTask?.cancel(true)
+        deleteAllTask = DBClearTask(this)
+        deleteAllTask?.execute()
+    }
+
+    private fun deletePostFromDB(post: Post) {
+        progressBar.visibility = ProgressBar.VISIBLE
+        deleteTask?.cancel(true)
+        deleteTask = DBDeleteTask(this)
+        deleteTask?.execute(post)
+    }
+
+    fun update() {
+        main_recycler.recycledViewPool.clear()
         listAdapter.notifyDataSetChanged()
     }
 
-    private fun showAlert(msg: String) {
+    fun showAlert(msg: String) {
         progressBar.visibility = ProgressBar.INVISIBLE
-        AlertDialog.Builder(this).apply {
-            setMessage(msg)
-            setPositiveButton(resources.getString(R.string.ok)) { dialog: DialogInterface, _: Int -> dialog.cancel() }
-        }.show()
+        Snackbar.make(main_layout, msg, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -95,6 +135,7 @@ class MainActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         postList = savedInstanceState.getParcelableArrayList<Post>(POST_LIST_KEY) as ArrayList<Post>
+        progressBar.visibility = ProgressBar.INVISIBLE
         update()
     }
 
@@ -103,12 +144,30 @@ class MainActivity : AppCompatActivity() {
             1 -> when (resultCode) {
                 2 -> {
                     val newPost: Post = (data?.getParcelableExtra(NEW_POST_KEY) ?: return) ?: return
-                    Log.i("new one", newPost.toString())
                     postNewPost(newPost)
                 }
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_refresh -> {
+                getAllPostsFromBD()
+                return true
+            }
+            R.id.action_reload -> {
+                getAllPosts()
+                return true
+            }
+            else -> false
+        }
     }
 
     inner class PostListCallback : Callback<List<Post>> {
@@ -117,10 +176,12 @@ class MainActivity : AppCompatActivity() {
                 showAlert("${resources.getString(R.string.bad_connection)} \n${response.code()}")
                 return
             }
+            reloadAPI()
             val result = response.body()
             postList.clear()
             postList.addAll(result as ArrayList)
-            listAdapter.notifyDataSetChanged()
+            insertPostInDatabase(*postList.toTypedArray())
+            update()
             showAlert("${resources.getString(R.string.new_posts)} \n${response.code()}")
         }
 
@@ -130,6 +191,7 @@ class MainActivity : AppCompatActivity() {
                     R.string.bad_connection
                 )}"
             )
+            update()
         }
     }
 
@@ -144,12 +206,15 @@ class MainActivity : AppCompatActivity() {
             val result = response.body()
             when (type) {
                 QUERY_POST -> {
+                    result?.postId = postList.size * 2 + 1
                     postList.add(result!!)
+                    insertPostInDatabase(result)
                     showAlert("${resources.getString(R.string.new_posts)} \n${response.code()}")
                 }
                 QUERY_DELETE -> {
                     if (postList.contains(post)) {
                         postList.remove(post)
+                        deletePostFromDB(post)
                         showAlert("${resources.getString(R.string.del_posts)} \n${response.code()}")
                     }
                 }
@@ -163,6 +228,20 @@ class MainActivity : AppCompatActivity() {
                     R.string.bad_connection
                 )}"
             )
+            when (type) {
+                QUERY_POST -> {
+                    post.postId = postList.size * 2 + 1
+                    postList.add(post)
+                    insertPostInDatabase(post)
+                }
+                QUERY_DELETE -> {
+                    if (postList.contains(post)) {
+                        postList.remove(post)
+                        deletePostFromDB(post)
+                    }
+                }
+            }
+            update()
         }
 
     }

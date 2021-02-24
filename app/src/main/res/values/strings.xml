@@ -3,7 +3,14 @@
     <string name="delete">delete</string>
     <string name="bad_connection">Bad Connection</string>
     <string name="fail">Failed</string>
-    <string name="new_posts">New posts added</string>
+    <string name="api_posts">Posts downloaded</string>
+    <string name="bd_posts">Posts downloaded from DB</string>
+    <string name="bd_ins">Posts inserted in DB</string>
+    <string name="bd_del">Posts deleted from DB</string>
+    <string name="bd_clr">DB cleared</string>
+    <string name="bd_ref">DB refreshed</string>
+    <string name="bd_empty">Empty DB</string>
+    <string name="new_posts">Synchronized with API</string>
     <string name="del_posts">Post deleted</string>
     <string name="ok">OK</string>
     <string name="title">Title</string>
@@ -11,4 +18,6 @@
     <string name="enter_title">Enter title</string>
     <string name="enter_body">Enter body</string>
     <string name="post">Post</string>
+    <string name="action_refresh">Refresh from DB</string>
+    <string name="action_reload">Reload from API</string>
 </resources>

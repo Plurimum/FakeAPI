@@ -1,6 +1,9 @@
 package com.example.fakeapi.application
 
 import android.app.Application
+import androidx.room.Room
+import com.example.fakeapi.FakeDatabase
+import com.example.fakeapi.MainActivity.Companion.DATABASE_NAME
 import com.example.fakeapi.interfaces.FakeAPI
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -9,6 +12,7 @@ import retrofit2.create
 class FakeApp : Application() {
 
     lateinit var fakeAPIService: FakeAPI
+    lateinit var postDB: FakeDatabase
 
     companion object {
         const val BASE_URL = "https://jsonplaceholder.typicode.com"
@@ -25,6 +29,8 @@ class FakeApp : Application() {
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
         fakeAPIService = mRetrofit.create()
+        postDB = Room.databaseBuilder(applicationContext, FakeDatabase::class.java, DATABASE_NAME)
+            .build()
     }
 
 }

@@ -10,16 +10,6 @@ interface FakeAPI {
     fun getAllPosts(
     ): Call<List<Post>>
 
-    @GET("posts/{id}")
-    fun getPostById(
-        @Path("id") id: Int
-    ): Call<Post>
-
-    @GET("posts/")
-    fun getPostByUserId(
-        @Query("userId") userId: Int
-    ): Call<List<Post>>
-
     @POST("posts/")
     fun loadNewPost(
         @Body data: Post
