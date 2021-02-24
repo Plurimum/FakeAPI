@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun postNewPost(data: Post) {
-        FakeApp.instance.fakeAPIService.loadNewPost(data).enqueue(PostCallback(QUERY_POST))
+        FakeApp.instance.fakeAPIService.loadNewPost(data).enqueue(PostCallback(QUERY_POST, data))
     }
 
     private fun deletePost(post: Post) {
@@ -186,6 +186,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // засунуть параметры в пост
     inner class PostCallback(private val type: String, private val post: Post = Post()) :
         Callback<Post> {
 
